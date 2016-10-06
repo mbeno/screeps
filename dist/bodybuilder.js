@@ -15,19 +15,19 @@ function builder(body) {
     for (part in body) {
         switch(part) {
             case WORK:
-                new_body.push(WORK);
+                new_body.push("work");
                 break;
             case MOVE:
-                new_body.push(MOVE);
+                new_body.push("move");
                 break;
             case CARRY:
-                new_body.push(CARRY);
+                new_body.push("carry");
                 break;
             case ATTACK:
-                new_body.push(ATTACK);
+                new_body.push("attack");
                 break;
             case HEAL:
-                new_body.push(HEAL);
+                new_body.push("heal");
                 break;
             default:
                 console.log("Could not find bodypart: " + JSON.stringify(part));
