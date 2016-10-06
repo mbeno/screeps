@@ -1,11 +1,11 @@
 
 
 const BODYS = {
-    'general': {WORK:5,MOVE:5,CARRY:5},
-    'speed_harvester': {WORK:9, MOVE:2},
-    'fighter': {TOUGH:5, MOVE:7, ATTACK:7},
-    'healer': {TOUGH: 3, MOVE:4, HEAL:3},
-    'hauler': {CARRY:13, MOVE:7}
+    'general': {'work':5,'move':5,'carry':5},
+    'speed_harvester': {'work':9, 'move':2},
+    'fighter': {'tough':5, 'move':7, 'attack':7},
+    'healer': {'tough': 3, 'move':4, 'heal':3},
+    'hauler': {'carry':13, 'move':7}
 };
 
 
