@@ -14,19 +14,19 @@ function builder(body) {
     var new_body
     for (part in body) {
         switch(part) {
-            case WORK:
+            case "work":
                 new_body.push("work");
                 break;
-            case MOVE:
+            case "move":
                 new_body.push("move");
                 break;
-            case CARRY:
+            case "carry":
                 new_body.push("carry");
                 break;
-            case ATTACK:
+            case "attack":
                 new_body.push("attack");
                 break;
-            case HEAL:
+            case "heal":
                 new_body.push("heal");
                 break;
             default:

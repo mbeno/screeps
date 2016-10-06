@@ -19,7 +19,7 @@ module.exports = {
         } else {
             creep.moveTo(Game.flags['healers']);
         }
-        
-        
+
+
     }
 };
