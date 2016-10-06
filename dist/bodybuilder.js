@@ -24,7 +24,7 @@ function builder(body) {
                 new_body.push("carry" * body[part]);
                 break;
             case "attack":
-                new_body.push("attack" * body[part]);
+                new_body.push(["attack" * body[part]]);
                 break;
             case "heal":
                 new_body.push("heal" * body[part]);
