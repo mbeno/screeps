@@ -11,7 +11,7 @@ const BODYS = {
 
 
 function builder(body) {
-    var new_body = []
+    var new_body = [];
     for (part in body) {
         switch(part) {
             case "work":
@@ -24,7 +24,7 @@ function builder(body) {
                 new_body.push("carry" * body[part]);
                 break;
             case "attack":
-                new_body.push(["attack" * body[part]]);
+                new_body.concat([_.times(body[part], _.constant("attack"))]);
                 break;
             case "heal":
                 new_body.push("heal" * body[part]);
