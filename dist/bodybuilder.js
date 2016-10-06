@@ -11,7 +11,7 @@ const BODYS = {
 
 
 function builder(body) {
-    var new_body
+    var new_body = []
     for (part in body) {
         switch(part) {
             case "work":
