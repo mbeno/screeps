@@ -15,10 +15,10 @@ function builder(body) {
     for (part in body) {
         switch(part) {
             case "work":
-                new_body.push("work");
+                new_body.push("work" * body[part]);
                 break;
             case "move":
-                new_body.push("move");
+                new_body.push("move" * body[part]);
                 break;
             case "carry":
                 new_body.push("carry");
