@@ -21,13 +21,13 @@ function builder(body) {
                 new_body.push("move" * body[part]);
                 break;
             case "carry":
-                new_body.push("carry");
+                new_body.push("carry" * body[part]);
                 break;
             case "attack":
-                new_body.push("attack");
+                new_body.push("attack" * body[part]);
                 break;
             case "heal":
-                new_body.push("heal");
+                new_body.push("heal" * body[part]);
                 break;
             default:
                 console.log("Could not find bodypart: " + JSON.stringify(part));
