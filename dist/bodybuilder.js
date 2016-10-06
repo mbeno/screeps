@@ -33,6 +33,7 @@ function builder(body) {
                 console.log("Could not find bodypart: " + JSON.stringify(part));
         }
     }
+    return new_body;
 }
 
 
