@@ -9,7 +9,7 @@
 var _ = require('lodash');
 
 function findEnergyStorage(creep) {
-    var sources = _.filter(creep.room.find(FIND_STRUCTURES), 
+    var sources = _.filter(creep.room.find(FIND_STRUCTURES),
     (o) => {return o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity});
     if(sources.length) {
         creep.memory.source = creep.pos.findClosestByPath(sources).id;
@@ -66,7 +66,7 @@ function deliverEnergy(creep) {
             creep.memory.target = null;
         }
         return true;
-    } 
+    }
     var containers = _.filter(creep.room.find(FIND_STRUCTURES), (o) => { return (Memory.haul_targets.indexOf(o) < 0) && (o.structureType == STRUCTURE_CONTAINER && ((o.store[RESOURCE_ENERGY] + 300) < o.storeCapacity))});
     if (containers.length > 0) {
         if(creep.memory.target == null) {
@@ -91,40 +91,40 @@ function bodyBuilder(price, role) {
     if (role == 'general') {
         var occurances = {'work': 0, 'move': 0, 'carry': 0};
         while(price >= 50) {
-            if (price >= BODYPART_COST.work && (occurances[WORK] == null || (occurances[WORK] < ((occurances[CARRY] / 2) + 2) ) )) { 
-    
+            if (price >= BODYPART_COST.work && (occurances[WORK] == null || (occurances[WORK] < ((occurances[CARRY] / 2) + 2) ) )) {
+
                 body.push(WORK);
                 price -= BODYPART_COST.work;
                 occurances[WORK] += 1;
             } else if(price >= BODYPART_COST.move && (occurances[MOVE] == null || ((occurances[WORK] + occurances[CARRY]) / 2) > occurances[MOVE])) {
-    
+
                 body.push(MOVE);
                 price -= BODYPART_COST.move;
                 occurances[MOVE] += 1;
             } else {
-    
+
                 body.push(CARRY);
                 price -= BODYPART_COST.carry;
                 occurances[CARRY] += 1;
             }
-    
+
         }
     } else if (role == 'hauler') {
         var occurances = {'move': 0, 'carry': 0};
         while(price >= 50) {
 
             if(price >= BODYPART_COST.move && (occurances[MOVE] == 0 || ((occurances[CARRY] / 2) )) > occurances[MOVE]) {
-    
+
                 body.push(MOVE);
                 price -= BODYPART_COST.move;
                 occurances[MOVE] += 1;
             } else {
-    
+
                 body.push(CARRY);
                 price -= BODYPART_COST.carry;
                 occurances[CARRY] += 1;
             }
-    
+
         }
     } else if (role == 'fighter') {
         var body = [];
@@ -147,7 +147,7 @@ function bodyBuilder(price, role) {
                 price -= BODYPART_COST.tough;
                 weight += 1;
                 occurances.tough += 1;
-            } 
+            }
         }
     } else if (role == 'healer') {
         var body = [];
@@ -166,7 +166,7 @@ function bodyBuilder(price, role) {
                 body.push(TOUGH);
                 price -= BODYPART_COST.tough;
                 weight += 1;
-            } 
+            }
         }
     }
     return body;

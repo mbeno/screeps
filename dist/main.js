@@ -31,12 +31,12 @@ function creepInfo() {
     var upgraders = _.filter(Game.creeps, (o) => { return o.memory.role == 'upgrader'}).length;
     var harvesters = _.filter(Game.creeps, (o) => { return o.memory.role == 'harvester'}).length;
     var idle = _.filter(Game.creeps, (o) => { return o.memory.role == 'idle'}).length;
-    console.log("#########NUMBER OF CREEPS###########\n"+ 
+    console.log("#########NUMBER OF CREEPS###########\n"+
                 "Haulers: " + haulers + "\n" +
                 "Builders: " + builders + "\n" +
-                "Harvesters: " + harvesters + "\n" + 
-                "Upgraders: " + upgraders + "\n" + 
-                "Idle: " + idle + "\n" + 
+                "Harvesters: " + harvesters + "\n" +
+                "Upgraders: " + upgraders + "\n" +
+                "Idle: " + idle + "\n" +
                 "#######################################");
 }
 
@@ -50,26 +50,25 @@ module.exports.loop = function () {
     roleManager.run("hauler");
     roleManager.run('fighter');
     roleManager.run('healer');
-    
+
     roleTower.run();
-    
-    
+
+
     if(cpumon) console.log("Cpu used  roleTower.run(); " + (Game.cpu.getUsed() - cpu_used));
-    
+
     if(cpumon) cpu_used = Game.cpu.getUsed();
-//    structureBuilder.run(STRUCTURE_EXTENSION);
     if(cpumon) console.log("Cpu used  creepBuilder.run(); " + (Game.cpu.getUsed() - cpu_used));
-    
+
     if(cpumon) cpu_used = Game.cpu.getUsed();
     for(var name in Game.creeps) {
         var creep = Game.creeps[name];
-        
+
         var rand = Math.floor(Math.random() * vocabulary.length);
         var rand2 = Math.floor(Math.random() * 20);
         if((rand2+1) == 1) {
             creep.say(vocabulary[rand], true);
         }
-        
+
         if(creep.memory.role == 'harvester') {
             roleHarvester.run(creep);
         }
@@ -89,7 +88,4 @@ module.exports.loop = function () {
             roleHealer.run(creep);
         }
     }
-    if(cpumon) console.log("Cpu used for(var name in Game.creeps) " + (Game.cpu.getUsed() - cpu_used));
-    if(cpumon) cpu_used = Game.cpu.getUsed();
-    if(cpumon) console.log("######################END CYCLE#######################");
 }
