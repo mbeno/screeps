@@ -24,7 +24,7 @@ module.exports.BODY = [WORK,MOVE, MOVE,CARRY, CARRY];
     '550': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY],
     '450': [WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY],
     '400': [WORK, WORK, MOVE, MOVE, CARRY, CARRY],
- * 
+ *
  *
 */
 
@@ -49,3 +49,12 @@ module.exports.MAX = {
     };
 module.exports.MAX_CREEPS = 14;
 module.exports.SPAWN = 'Spawn1';
+
+module.exports.creep = {
+    'wall_max_repair': 100000,
+    'rampart_max_repair': 100000
+}
+module.exports.tower = {
+    'wall_max_repair': 100000,
+    'rampart_max_repair': 100000
+}

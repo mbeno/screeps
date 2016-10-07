@@ -14,16 +14,23 @@ var roleBuilder = {
 	    if(creep.memory.building) {
 	        creep.memory.source = null;
 	        var targets = creep.room.find(FIND_CONSTRUCTION_SITES);
-	        var roads = _.filter(creep.room.find(FIND_STRUCTURES), (structure) => {return ((structure.structureType == STRUCTURE_ROAD || structure.structureType == STRUCTURE_CONTAINER) && (structure.hits+1000) < structure.hitsMax)});
+	        var roads = _.filter(creep.room.find(FIND_STRUCTURES),
+                                 ( structure ) => { return (
+                                     (structure.structureType == STRUCTURE_ROAD ||
+                                      structure.structureType == STRUCTURE_CONTAINER || ((
+                                      structure.structureType == STRUCTURE_WALL ||
+                                      structure.structureType == STRUCTURE_RAMPART) &&
+                                      structure.hits < 100000)) &&
+                                      ( structure.hits + 1000 ) < structure.hitsMax ) } );
 	        var walls = _.filter(creep.room.find(FIND_STRUCTURES), (structure) => {return structure.structureType == STRUCTURE_WALL && structure.hits < 20000});
-	        
+
 	        if(roads.length) console.log("Number of roads in need of repair: " + roads.length);
-            
+
             if(targets.length || roads.length || walls.length) {
                 if(roads.length > 0) {
                     if(creep.memory.repair_target == null) {
                         creep.memory.repair_target = creep.pos.findClosestByRange(roads).id;
-                        
+
                     }
                     var road = Game.getObjectById(creep.memory.repair_target);
                     if (road.hits < road.hitsMax) {
@@ -62,7 +69,7 @@ var roleBuilder = {
 	                creep.memory.source = sources[Math.floor(Math.random() * sources.length) ].id;
 	                }
 	            }
-	        } 
+	        }
 	        var source = Game.getObjectById(creep.memory.source)
 	        if(source == null) return;
 	       if (source.structureType == STRUCTURE_STORAGE || source.structureType == STRUCTURE_CONTAINER) {
