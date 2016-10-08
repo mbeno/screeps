@@ -52,9 +52,9 @@ module.exports.SPAWN = 'Spawn1';
 
 module.exports.creep = {
     'wall_max_repair': 100000,
-    'rampart_max_repair': 100000
+    'rampart_max_repair': 50000
 }
 module.exports.tower = {
     'wall_max_repair': 100000,
-    'rampart_max_repair': 100000
+    'rampart_max_repair': 50000
 }
