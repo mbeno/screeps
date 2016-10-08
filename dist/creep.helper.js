@@ -7,13 +7,95 @@
  * mod.thing == 'a thing'; // true
  */
 var _ = require('lodash');
-
 function findEnergyStorage(creep) {
     var sources = _.filter(creep.room.find(FIND_STRUCTURES),
     (o) => {return o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity});
     if(sources.length) {
         creep.memory.source = creep.pos.findClosestByPath(sources).id;
     }
+}
+
+function findEnergySource(creep){
+    if(creep.memory.source == null) {
+        var sources = creep.room.find(FIND_SOURCES_ACTIVE);
+        if (sources.length > 0) {
+            creep.memory.source = creep.pos.findClosestByRange(sources).id;
+        }
+    }
+    var source = Game.getObjectById(creep.memory.source);
+    var harvest_ret = creep.harvest(source);
+    if(harvest_ret == OK) return true;
+    else if (harvest_ret == ERR_NOT_IN_RANGE) {
+        var move_ret = creep.moveTo(source);
+        if (move_ret == ERR_NO_PATH) {
+            creep.say("no path!");
+            var sources = _.filter(creep.room.find(FIND_SOURCES_ACTIVE), (o) => { return o.id != creep.memory.source});
+            if (sources.length > 0) {
+                creep.memory.source = creep.pos.findClosestByRange(sources).id;
+                return true;
+            } else return false;
+        }
+        return true;
+    } else if (harvest_ret == ERR_NOT_ENOUGH_RESOURCES) {
+        creep.say("no resources!");
+        var sources = _.filter(creep.room.find(FIND_SOURCES_ACTIVE), (o) => { return o.id != creep.memory.id});
+        if (sources.length > 0) {
+            creep.memory.source = creep.pos.findClosestByRange(sources).id;
+            return true;
+        } else return false;
+
+    }
+}
+
+function repair(creep) {
+    if (creep.memory.repair_target == null) {
+        var targets = _.filter(creep.room.find(FIND_STRUCTURES), (o) => { return
+                               ((o.structureType == STRUCTURE_ROAD ||
+                               o.structureType == STRUCTURE_CONTAINER) &&
+                               o.hits+1000 < o.hitsMax) ||
+                               (o.structureType == STRUCTURE_WALL && o.hits < c.creep.wall_max_repair) ||
+                               (o.structureType == STRUCTURE_RAMPART && o.hits < c.creep.rampart_max_repair)});
+        if (targets > 0) {
+            creep.memory.repair_target = creep.pos.findClosestByRange(targets).id;
+        } else {
+            return false;
+        }
+    }
+    var target = Game.getObjectById(creep.memory.repair_target);
+    if (target.hits < target.hitsMax) {
+        var repair_ret = creep.repair(target);
+        if (repair_ret == OK) return true;
+        else if (repair_ret == ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+            return true;
+        }
+    } else {
+        creep.memory.repair_target = null;
+        return false;
+    }
+    return false;
+}
+
+function build(creep) {
+    if (creep.memory.build_target == null) {
+        var build_targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+        if( build_targets.length > 0) {
+            creep.memory.build_target = creep.pos.findClosestByRange(build_targets).id;
+        } else {
+            return false;
+        }
+    }
+    var build_ret = creep.build(Game.getObjectById(creep.memory.build_target));
+    if (build_ret == OK) return true;
+    else if (build_ret == ERR_NOT_IN_RANGE) {
+        creep.moveTo(Game.getObjectById(creep.memory.build_target));
+        return true;
+    }
+    else {
+        creep.memory.build_target = null;
+        return false;
+    }
+    return false;
 }
 
 function getEnergy(creep) {
@@ -86,91 +168,6 @@ function deliverEnergy(creep) {
     return false;
 }
 
-function bodyBuilder(price, role) {
-    var body = [];
-    if (role == 'general') {
-        var occurances = {'work': 0, 'move': 0, 'carry': 0};
-        while(price >= 50) {
-            if (price >= BODYPART_COST.work && (occurances[WORK] == null || (occurances[WORK] < ((occurances[CARRY] / 2) + 2) ) )) {
-
-                body.push(WORK);
-                price -= BODYPART_COST.work;
-                occurances[WORK] += 1;
-            } else if(price >= BODYPART_COST.move && (occurances[MOVE] == null || ((occurances[WORK] + occurances[CARRY]) / 2) > occurances[MOVE])) {
-
-                body.push(MOVE);
-                price -= BODYPART_COST.move;
-                occurances[MOVE] += 1;
-            } else {
-
-                body.push(CARRY);
-                price -= BODYPART_COST.carry;
-                occurances[CARRY] += 1;
-            }
-
-        }
-    } else if (role == 'hauler') {
-        var occurances = {'move': 0, 'carry': 0};
-        while(price >= 50) {
-
-            if(price >= BODYPART_COST.move && (occurances[MOVE] == 0 || ((occurances[CARRY] / 2) )) > occurances[MOVE]) {
-
-                body.push(MOVE);
-                price -= BODYPART_COST.move;
-                occurances[MOVE] += 1;
-            } else {
-
-                body.push(CARRY);
-                price -= BODYPART_COST.carry;
-                occurances[CARRY] += 1;
-            }
-
-        }
-    } else if (role == 'fighter') {
-        var body = [];
-        var cmove = 0;
-        var weight = 0;
-        var occurances = {'attack': 0, 'tough': 0}
-        while(price >= 50) {
-            if( price >= BODYPART_COST.move && cmove <= (weight / 2)) {
-                body.push(MOVE);
-                price -= BODYPART_COST.move;
-                cmove += 1;
-            } else
-            if( price >= BODYPART_COST.attack && (weight / 2) < cmove  && occurances.attack <= (occurances.tough * 1.2)) {
-                body.push(ATTACK);
-                price -= BODYPART_COST.attack;
-                occurances.attack += 1;
-                weight += 1;
-            }else {
-                body.push(TOUGH);
-                price -= BODYPART_COST.tough;
-                weight += 1;
-                occurances.tough += 1;
-            }
-        }
-    } else if (role == 'healer') {
-        var body = [];
-        var cmove = 0;
-        var weight = 0;
-        while(price >= 50) {
-            if( price >= BODYPART_COST.heal && (weight / 2) <= cmove) {
-                body.push(HEAL);
-                price -= BODYPART_COST.heal;
-                weight += 1;
-            }else if (cmove <= (weight / 2)) {
-                body.push(MOVE);
-                price -= BODYPART_COST.move;
-                cmove += 1;
-            }  else {
-                body.push(TOUGH);
-                price -= BODYPART_COST.tough;
-                weight += 1;
-            }
-        }
-    }
-    return body;
-}
 
 function isFull(creep) {
     if(creep.carry.energy == creep.carryCapacity) return true;
@@ -182,5 +179,7 @@ module.exports = {
     getEnergy: getEnergy,
     deliverEnergy: deliverEnergy,
     isFull: isFull,
-    bodyBuilder: bodyBuilder
+    findEnergySource: findEnergySource,
+    build: build,
+    repair: repair
 };

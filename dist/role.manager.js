@@ -35,7 +35,7 @@ function getAvailableResourceSpace() {
 }
 
 module.exports = {
-    run: function(role) { 
+    run: function(role) {
         if (getWorkers(role).length < builder.MAX[role]) {
             if (role == 'fighter') {
                 builder.run('fighter');
@@ -51,16 +51,16 @@ module.exports = {
                             worker.memory.role = 'hauler'
                             console.log(worker.name + " reassigned as " + role);
                             return;
-                        } 
+                        }
                 } else if (idleWorkers.length > 0 && _.filter(idleWorkers[0].body, { type: 'work'}).length) {
                     idleWorkers[0].memory.role = role;
                     console.log(idleWorkers[0].name + " reassigned as " + role);
                     return;
                 }
             }
-            if(role == 'hauler') { builder.run('hauler') } else { builder.run('general') }
+            if(role == 'hauler') { builder.build('hauler') } else { builder.run('general') }
         }
-        
+
     },
     idle: function() { console.log(getIdleWorkers().length) }
 };

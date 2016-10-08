@@ -1,55 +1,55 @@
-/*
- * Module code goes here. Use 'module.exports' to export things:
- * module.exports.thing = 'a thing';
- *
- * You can import it from another modules like this:
- * var mod = require('config');
- * mod.thing == 'a thing'; // true
- */
-
-module.exports.BODY = [WORK,MOVE, MOVE,CARRY, CARRY];
-
-
-/**
-    '800': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, CARRY, CARRY],
-    '750': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, CARRY],
-    '700': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE],
-    '650': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY],
-    '600': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY],
-        '800': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, CARRY, CARRY],
-    '750': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, CARRY],
-    '700': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE],
-    '650': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY],
-    '600': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY],
-    '550': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY],
-    '450': [WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY],
-    '400': [WORK, WORK, MOVE, MOVE, CARRY, CARRY],
- *
- *
-*/
-
-module.exports.BODYS = {
-    '800': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, MOVE],
-    '750': [WORK, WORK, WORK, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, MOVE, MOVE, CARRY],
-    '700': [WORK, WORK, WORK, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY, MOVE],
-    '650': [WORK, WORK, WORK, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY, CARRY],
-    '600': [WORK, WORK, WORK, MOVE, MOVE, MOVE, CARRY, CARRY, CARRY],
-    '550': [WORK, WORK, WORK, MOVE, MOVE, MOVE, CARRY, CARRY],
-    '450': [WORK, WORK, MOVE, MOVE, MOVE, CARRY, CARRY],
-    '400': [WORK, WORK, MOVE, MOVE, CARRY, CARRY],
-    '350': [WORK, MOVE, MOVE, CARRY, CARRY, CARRY],
-    '300': [WORK, MOVE, MOVE, CARRY, CARRY]
+const bodys = {
+    'general': {'work':5,'move':5,'carry':5},
+    'speed_harvester': {'work':9, 'move':2},
+    'fighter': {'tough':5, 'move':7, 'attack':7},
+    'healer': {'tough': 3, 'move':4, 'heal':3},
+    'hauler': {'carry':13, 'move':7}
 };
 
-module.exports.MAX = {
-    'harvester' : 5,
-    'builder' : 5,
-    'upgrader': 3,
-    'hauler': 1
-    };
-module.exports.MAX_CREEPS = 14;
-module.exports.SPAWN = 'Spawn1';
+const eco_bodys = {
+    '300': {'work': 1, 'carry':2, 'move':2},
+    '500': {'work': 2, 'carry':3, 'move':3},
+    '700': {'work': 3, 'carry':4, 'move':4}
+};
 
+
+
+const names = [
+    'Vegard',
+    'Silje',
+    'Benjamin',
+    'Thor',
+    'Torjus',
+    'Benny',
+    'Daniel',
+    'Lille-Silje',
+    'Lille-Vegard',
+    'Lille-Benny',
+    'Lille-Thor',
+    'Lille-Torjus',
+    'Lille-Daniel',
+    'Safet',
+    'Lille-Safet'
+    ];
+
+
+module.exports.bodys = bodys;
+
+module.exports.eco_bodys = eco_bodys;
+
+
+module.exports.general_body = eco_bodys['300'];
+
+
+module.exports.max_roles = {
+    'harvester' : 3,
+    'builder' : 3,
+    'upgrader': 1,
+    'hauler': 0
+    };
+module.exports.max_creeps = 14;
+module.exports.spawn = 'Spawn1';
+module.exports.names = names;
 module.exports.creep = {
     'wall_max_repair': 100000,
     'rampart_max_repair': 50000

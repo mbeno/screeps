@@ -1,12 +1,6 @@
 var _ = require('lodash');
+var c = require('config');
 
-const BODYS = {
-    'general': {'work':5,'move':5,'carry':5},
-    'speed_harvester': {'work':9, 'move':2},
-    'fighter': {'tough':5, 'move':7, 'attack':7},
-    'healer': {'tough': 3, 'move':4, 'heal':3},
-    'hauler': {'carry':13, 'move':7}
-};
 
 function testbuilder() {
     for (var b in BODYS) {
@@ -14,6 +8,15 @@ function testbuilder() {
     }
 }
 
+function general() {
+    return builder(c.general_body);
+}
+
+function build(role) {
+    if (role == "general") {
+        return general();
+    }
+}
 
 function builder(body) {
     var new_body = [];
@@ -52,5 +55,7 @@ function builder(body) {
 
 module.exports = {
     builder: builder,
-    testbuilder, testbuilder
+    testbuilder: testbuilder,
+    general: general,
+    build: build
 };
