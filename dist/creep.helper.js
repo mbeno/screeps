@@ -7,11 +7,76 @@
  * mod.thing == 'a thing'; // true
  */
 var _ = require('lodash');
+var c = require('config');
 function findEnergyStorage(creep) {
     var sources = _.filter(creep.room.find(FIND_STRUCTURES),
-    (o) => {return o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity});
-    if(sources.length) {
+    (o) => {return (o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity) || (o.structureType == STRUCTURE_CONTAINER && o.store[RESOURCE_ENERGY] > 300 )});
+    var prefered_sources = _.filter(sources,
+    (o) => {return Memory.storage_containers.indexOf(o.id) > -1});
+    if(prefered_sources.length > 0) {
+        creep.memory.source = creep.pos.findClosestByPath(prefered_sources).id;
+    } else if (sources.length > 0) {
         creep.memory.source = creep.pos.findClosestByPath(sources).id;
+    } else {
+        findEnergySource(creep);
+    }
+}
+function deliverBase(creep) {
+    var base = creep.room.find(FIND_STRUCTURES, {
+            filter: (structure) => {
+                return ((structure.structureType == STRUCTURE_EXTENSION ||
+                        structure.structureType == STRUCTURE_SPAWN) && structure.energy < structure.energyCapacity)
+            }
+    });
+    if (base.length > 0) {
+        var target = creep.pos.findClosestByRange(base);
+        var ret = creep.transfer(target, RESOURCE_ENERGY);
+        if(ret == ERR_NOT_IN_RANGE) {
+            creep.moveTo(target);
+            return true;
+        } else if (ret != OK) {
+            if (creep.carry.energy == 0) {
+                creep.memory.status = 'gathering';
+                creep.say('gathering');
+            }
+            creep.memory.source = null;
+            return false;
+        } else {
+            return true;
+        }
+    } else return false;
+}
+
+function deliverContainer(creep) {
+    if(creep.memory.target == null) {
+
+        var stor = creep.room.find(FIND_STRUCTURES, {
+                filter: (structure) => {
+                    return ((structure.structureType == STRUCTURE_STORAGE && (structure.store[RESOURCE_ENERGY] < structure.storeCapacity)) ||
+                            (structure.structureType == STRUCTURE_CONTAINER && Memory.source_containers.indexOf(structure.id) > -1 && structure.store[RESOURCE_ENERGY] < structure.storeCapacity) )
+                }
+        });
+        if (stor.length > 0) {
+            creep.memory.target = creep.pos.findClosestByRange(stor).id;
+        } else {
+            return false;
+        }
+    }
+    var target = Game.getObjectById(creep.memory.target);
+    var ret = creep.transfer(target, RESOURCE_ENERGY);
+    if(ret == ERR_NOT_IN_RANGE) {
+        creep.moveTo(target);
+        return true;
+    } else if (ret == ERR_NOT_ENOUGH_RESOURCES) {
+            creep.memory.status = 'gathering';
+            creep.say('gathering');
+            creep.memory.source = null;
+            return true;
+    } else if(ret != OK) {
+        creep.memory.source = null;
+        return false;
+    } else {
+        return true;
     }
 }
 
@@ -25,6 +90,41 @@ function findEnergySource(creep){
     var source = Game.getObjectById(creep.memory.source);
     var harvest_ret = creep.harvest(source);
     if(harvest_ret == OK) return true;
+    else if (harvest_ret == ERR_NOT_IN_RANGE) {
+        var move_ret = creep.moveTo(source);
+        if (move_ret == ERR_NO_PATH) {
+            creep.say("no path!");
+            var sources = _.filter(creep.room.find(FIND_SOURCES_ACTIVE), (o) => { return o.id != creep.memory.source});
+            if (sources.length > 0) {
+                creep.memory.source = creep.pos.findClosestByRange(sources).id;
+                return true;
+            } else return false;
+        }
+        return true;
+    } else if (harvest_ret == ERR_NOT_ENOUGH_RESOURCES) {
+        creep.say("no resources!");
+        var sources = _.filter(creep.room.find(FIND_SOURCES_ACTIVE), (o) => { return o.id != creep.memory.id});
+        if (sources.length > 0) {
+            creep.memory.source = creep.pos.findClosestByRange(sources).id;
+            return true;
+        } else return false;
+
+    }
+}
+
+function findEnergySourceShort(creep) {
+    if(creep.memory.source == null) {
+        var sources = creep.room.find(FIND_SOURCES_ACTIVE);
+        if (sources.length > 0) {
+            creep.memory.source = creep.pos.findClosestByRange(sources).id;
+        }
+    }
+    var source = Game.getObjectById(creep.memory.source);
+    var harvest_ret = creep.harvest(source);
+    if(harvest_ret == OK) {
+//        deliverContainer(creep);
+        return true;
+    }
     else if (harvest_ret == ERR_NOT_IN_RANGE) {
         var move_ret = creep.moveTo(source);
         if (move_ret == ERR_NO_PATH) {
@@ -79,6 +179,11 @@ function repair(creep) {
 function build(creep) {
     if (creep.memory.build_target == null) {
         var build_targets = creep.room.find(FIND_CONSTRUCTION_SITES);
+        var pri_build_targets = _.filter(build_targets, (o) => { return o.structureType == STRUCTURE_EXTENSION });
+        if(pri_build_targets.length > 0){
+            console.log("Building priority target");
+            build_targets = pri_build_targets;
+        }
         if( build_targets.length > 0) {
             creep.memory.build_target = creep.pos.findClosestByRange(build_targets).id;
         } else {
@@ -106,7 +211,7 @@ function getEnergy(creep) {
     if(ret == ERR_NOT_IN_RANGE) {
         creep.moveTo(Game.getObjectById(creep.memory.source));
     } else if (ret == ERR_INVALID_TARGET) {
-        creep.source = null;
+        creep.memory.source = null;
     }
 }
 
@@ -149,7 +254,8 @@ function deliverEnergy(creep) {
         }
         return true;
     }
-    var containers = _.filter(creep.room.find(FIND_STRUCTURES), (o) => { return (Memory.haul_targets.indexOf(o) < 0) && (o.structureType == STRUCTURE_CONTAINER && ((o.store[RESOURCE_ENERGY] + 300) < o.storeCapacity))});
+    var containers = _.filter(creep.room.find(FIND_STRUCTURES), (o) => { return (Memory.haul_targets.indexOf(o) < 0) && (o.structureType == STRUCTURE_CONTAINER && ((o.store[RESOURCE_ENERGY] + 300) < o.storeCapacity) &&
+                                                                                                                        Memory.storage_containers.indexOf(o.id) > -1 )});
     if (containers.length > 0) {
         if(creep.memory.target == null) {
             creep.memory.target = creep.pos.findClosestByRange(containers).id;
@@ -180,6 +286,10 @@ module.exports = {
     deliverEnergy: deliverEnergy,
     isFull: isFull,
     findEnergySource: findEnergySource,
+    findEnergySourceShort: findEnergySourceShort,
     build: build,
-    repair: repair
+    repair: repair,
+    deliverBase: deliverBase,
+    deliverContainer: deliverContainer
+
 };

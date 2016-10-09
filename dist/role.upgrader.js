@@ -20,7 +20,7 @@ var roleUpgrader = {
             }
         }
         else {
-            helper.findEnergySource(creep);
+            helper.getEnergy(creep);
         }
 	}
 };

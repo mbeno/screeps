@@ -9,12 +9,58 @@ function testbuilder() {
 }
 
 function general() {
-    return builder(c.general_body);
+    var energyAvailable = Game.spawns[c.spawn].room.energyCapacityAvailable;
+    if (energyAvailable >= 1000) {
+        return builder(c.bodys['general']);
+    } else if (energyAvailable >= 800) {
+        return builder(c.eco_bodys['800']);
+    } else if (energyAvailable >= 550) {
+        return builder(c.eco_bodys['550']);
+    } else if (energyAvailable >= 300) {
+        return builder(c.bodys['300']);
+    }
+
+
+}
+
+function hauler() {
+    var energyAvailable = Game.spawns[c.spawn].room.energyCapacityAvailable;
+    if (energyAvailable >= 1000) {
+        return builder(c.eco_hauler['1000']);
+    } else if (energyAvailable >= 800) {
+        return builder(c.eco_hauler['800']);
+    } else if (energyAvailable >= 550) {
+        return builder(c.eco_hauler['550']);
+    }
+}
+
+function harvester() {
+    var bodys;
+    var energyAvailable = Game.spawns[c.spawn].room.energyCapacityAvailable;
+    if(c.harvester_mode == "short") {
+        bodys = c.harvester;
+    } else {
+        bodys = c.eco_bodys;
+    }
+    if (energyAvailable >= 1000) {
+        return builder(bodys['1000']);
+    } else if (energyAvailable >= 800) {
+        return builder(bodys['800']);
+    } else if (energyAvailable >= 550) {
+        return builder(bodys['550']);
+    }
+
 }
 
 function build(role) {
-    if (role == "general") {
+    if (role == "upgrader" || role == "builder") {
         return general();
+    } else if (role == "hauler") {
+        return hauler()
+    } else if (role == "fighter") {
+    } else if (role == "healer") {
+    } else if (role == "harvester") {
+        return harvester();
     }
 }
 

@@ -1,7 +1,7 @@
 
 var _ = require('lodash')
 var helper = require('creep.helper')
-
+var c = require('config');
 var roleHarvester = {
     /** @param {Creep} creep **/
     run: function(creep) {
@@ -10,39 +10,20 @@ var roleHarvester = {
                 creep.memory.status = 'delivering';
                 creep.say("delivering");
             }
-            helper.findEnergySource(creep);
+            if(c.harvester_mode == "short") {
+                helper.findEnergySourceShort(creep);
+            } else {
+                helper.findEnergySource(creep);
+            }
         }
         else {
             creep.memory.status = 'delivering';
-            var targets = null;
-            var base = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return ((structure.structureType == STRUCTURE_EXTENSION ||
-                                structure.structureType == STRUCTURE_SPAWN) && structure.energy < structure.energyCapacity)
-                    }
-            });
-            var stor = creep.room.find(FIND_STRUCTURES, {
-                    filter: (structure) => {
-                        return ((structure.structureType == STRUCTURE_STORAGE && (structure.store[RESOURCE_ENERGY] < structure.storeCapacity)))
-                    }
-            });
-            if (base.length) targets = base;
-            else targets = stor;
-            if(targets.length > 0) {
-                var tTarget = creep.pos.findClosestByRange(targets);
-                var ret = creep.transfer(tTarget, RESOURCE_ENERGY);
-                if(ret == ERR_NOT_IN_RANGE) {
-                    creep.moveTo(tTarget);
-                } else if (ret != OK) {
-                    if (creep.carry.energy == 0) {
-                        creep.memory.status = 'gathering';
-                        creep.say('gathering');
-                    }
-                    creep.memory.source = null;
-                }
-            } else {
-                creep.moveTo(Game.flags['idle']);
+            if(c.harvester_mode == "long") {
+                if(helper.deliverBase(creep)) return;
+                if(helper.deliverContainer(creep)) return;
             }
+            if(helper.deliverContainer(creep)) return;
+            else if (c.harvester_mode == "long") creep.moveTo(Game.flags['idle']);
         }
 	}
 };

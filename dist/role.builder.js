@@ -17,8 +17,8 @@ var roleBuilder = {
                 creep.memory.source = null;
                 var ret = helper.repair(creep);
                 if(!ret) ret = helper.build(creep);
-                if(!ret) helper.findEnergySource(creep);
-            } else helper.findEnergySource(creep);
+                if(!ret) creep.moveTo(Game.flags['idle']);
+            } else helper.getEnergy(creep);
         }
 }
 

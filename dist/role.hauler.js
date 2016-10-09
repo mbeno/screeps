@@ -22,6 +22,7 @@ module.exports = {
             helper.getEnergy(creep);
             if(helper.isFull(creep)) {
                 creep.memory.status = 'delivering';
+                creep.memory.source = null;
             }
         }
     }

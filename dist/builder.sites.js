@@ -11,33 +11,11 @@
 
 function findConstructionSite() {
     var _ = require('lodash');
-    var rx = Game.spawns['Spawn1'].pos.x;
-    var ty = Game.spawns['Spawn1'].pos.y;
-    var lx = rx;
-    var by = Game.spawns['Spawn1'].pos.y;
-    rx += 2;
-    lx += 2;
-    ty -= 1;
-    by += 1;
-
-
-        for (var i = 0; i<10; i++) {
-            var area = Game.spawns['Spawn1'].room.lookAtArea(ty,lx,by,rx, true);
-            var result = _.filter(area, { 'terrain': 'wall' })
-            var structs = _.filter(area, (o) => o.type == 'structure' || o.type == 'constructionSite')
-            var spots = [];
-            for (var a of area) {
-                spots.push(new RoomPosition(a.x,a.y,Game.spawns['Spawn1'].room.name));
-            }
-            if (result.length == 0 && structs.length < spots.length) {
-                Memory.build_site = spots;
-                break;
-            } else {
-                rx +=2;
-                lx +=2;
-            }
-        }
-
+    var flags = Game.spawns.Spawn1.room.find(FIND_FLAGS);
+    var start_x = flags['buildfrom'].pos.x;
+    var start_y = flags['buildfrom'].pos.y;
+    var end_x = flags['buildto'].pos.x;
+    var end_y = flags['buildto'].pos.y;
 }
 
 function buildSite(site_type) {
@@ -47,11 +25,11 @@ function buildSite(site_type) {
     } else {
         findConstructionSite();
     }
-    
+
 }
 
 module.exports = {
-    
+
     run(site_type) {
         buildSite(site_type);
     }
