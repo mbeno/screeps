@@ -5,6 +5,7 @@ var c = require('config');
 var roleHarvester = {
     /** @param {Creep} creep **/
     run: function(creep) {
+        if(c.harvester_mode == "short") helper.harvestLoop(creep);
 	    if(creep.carry.energy < creep.carryCapacity && creep.memory.status == 'gathering') {
             if (creep.carry.energy == creep.carryCapacity) {
                 creep.memory.status = 'delivering';

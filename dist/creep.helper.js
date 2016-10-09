@@ -9,8 +9,14 @@
 var _ = require('lodash');
 var c = require('config');
 function findEnergyStorage(creep) {
-    var sources = _.filter(creep.room.find(FIND_STRUCTURES),
-    (o) => {return (o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity) || (o.structureType == STRUCTURE_CONTAINER && o.store[RESOURCE_ENERGY] > 300 )});
+
+    if(creep.memory.role == "hauler") {
+        var sources = _.filter(creep.room.find(FIND_STRUCTURES),
+                            (o) => {return ((Memory.storage_containers.indexOf(o.id) < 0) && ((o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity) || (o.structureType == STRUCTURE_CONTAINER && o.store[RESOURCE_ENERGY] > 300 )))});
+    } else {
+        var sources = _.filter(creep.room.find(FIND_STRUCTURES),
+        (o) => {return (o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity) || (o.structureType == STRUCTURE_CONTAINER && o.store[RESOURCE_ENERGY] > 300 )});
+    }
     var prefered_sources = _.filter(sources,
     (o) => {return Memory.storage_containers.indexOf(o.id) > -1});
     if(prefered_sources.length > 0) {
@@ -45,6 +51,23 @@ function deliverBase(creep) {
             return true;
         }
     } else return false;
+}
+
+function harvestLoop(creep) {
+    if(Memory.sourcesInUse == null) Memory.sourcesInUse = [];
+    if(creep.memory.source == null) {
+        var sources = _.filter(creep.room.find(FIND_SOURCES_ACTIVE), (o) => { return Memory.sourcesInUse.indexOf(o.id) < 0 });
+        if(sources.length == 0) return;
+        creep.memory.source = sources[0].id;
+        Memory.sourcesInUse.push(creep.memory.source);
+    }
+    if (creep.memory.target == null) {
+        creep.memory.target = Memory.source_targets[creep.memory.source];
+    }
+    var source = Game.getObjectById(creep.memory.source);
+    var target = Game.getObjectById(creep.memory.target);
+    if(creep.transfer(target, RESOURCE_ENERGY) == ERR_NOT_IN_RANGE) creep.moveTo(target);
+    else if(creep.harvest(source) == ERR_NOT_IN_RANGE) creep.moveTo(source);
 }
 
 function deliverContainer(creep) {
@@ -290,6 +313,7 @@ module.exports = {
     build: build,
     repair: repair,
     deliverBase: deliverBase,
-    deliverContainer: deliverContainer
+    deliverContainer: deliverContainer,
+    harvestLoop: harvestLoop
 
 };

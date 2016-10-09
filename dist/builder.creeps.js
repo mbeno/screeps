@@ -30,6 +30,21 @@ function clearIdle() {
             }
         }
     }
+    var creep_sources = [];
+    for(var name in Game.creeps) {
+        var creep = Game.creeps[name];
+        if(creep.memory.role == "harvester") {
+            creep_sources.push(creep.memory.source);
+        }
+    }
+    console.log(JSON.stringify(creep_sources));
+    for(var source in Memory.sourcesInUse) {
+        if (creep_sources.indexOf(source) < 0) {
+            console.log("Deleting source assignment");
+            var index = Memory.sourcesInUse.indexOf(source);
+            Memory.sourcesInUse.splice(index,1);
+        }
+    }
 }
 
 function checkJobs() {
