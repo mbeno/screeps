@@ -9,6 +9,7 @@ var roleTower = require('role.turret');
 var roleFighter = require('role.fighter');
 var roleHealer = require('role.healer');
 var _ = require('lodash');
+var c = require('config');
 const vocabulary = [
     'herp',
     'derp'
@@ -20,7 +21,7 @@ const nearing_death = [
     ];
 
 var cpumon = false;
-
+var NAMES = c.names;
 
 function creepInfo() {
     for (var creep in Game.creeps) {
@@ -40,10 +41,38 @@ function creepInfo() {
                 "#######################################");
 }
 
+function clearIdle() {
+    for(var name in Memory.creeps) {
+        if (!Game.creeps[name]) {
+            delete Memory.creeps[name];
+            if (_.includes(NAMES, name)) {
+                console.log("OH NOES! " + name + " has died! :'(");
+            } else {
+                console.log("Removed memories of " + name + ", it will not be missed.");
+            }
+        }
+    }
+    var creep_sources = [];
+    for(var name in Game.creeps) {
+        var creep = Game.creeps[name];
+        if(creep.memory.role == "harvester") {
+            creep_sources.push(creep.memory.source);
+        }
+    }
+    for(var source in Memory.sourcesInUse) {
+        if(Memory.sourcesInUse[source]) {
+            if (creep_sources.indexOf(source) < 0) {
+                Memory.sourcesInUse[source] = false;
+            }
+        }
+    }
+}
 
 
 module.exports.loop = function () {
    //creepInfo();
+
+    clearIdle();
     roleManager.run("harvester");
     roleManager.run("builder");
     roleManager.run("upgrader");

@@ -54,12 +54,12 @@ function deliverBase(creep) {
 }
 
 function harvestLoop(creep) {
-    if(Memory.sourcesInUse == null) Memory.sourcesInUse = [];
+    if(Memory.sourcesInUse == null) Memory.sourcesInUse = {};
     if(creep.memory.source == null) {
-        var sources = _.filter(creep.room.find(FIND_SOURCES_ACTIVE), (o) => { return Memory.sourcesInUse.indexOf(o.id) < 0 });
+        var sources = _.filter(creep.room.find(FIND_SOURCES_ACTIVE), (o) => { return !Memory.sourcesInUse[o.id] });
         if(sources.length == 0) return;
         creep.memory.source = sources[0].id;
-        Memory.sourcesInUse.push(creep.memory.source);
+        Memory.sourcesInUse[creep.memory.source] = true;
     }
     if (creep.memory.target == null) {
         creep.memory.target = Memory.source_targets[creep.memory.source];

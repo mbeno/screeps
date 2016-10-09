@@ -57,7 +57,7 @@ module.exports.general_body = eco_bodys['300'];
 module.exports.max_roles = {
     'harvester' : 2,
     'builder' : 3,
-    'upgrader': 3,
+    'upgrader': 2,
     'hauler': 2,
     'fighter': 0,
     'healer': 0
