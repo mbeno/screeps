@@ -21,8 +21,7 @@ const eco_hauler = {
 
 const harvester = {
     '550': {'work': 4, 'carry': 1, 'move': 1},
-    '800': {'work': 7, 'carry': 1, 'move': 1},
-    '1000': {'work': 9, 'carry': 1, 'move': 1}
+    '700': {'work': 6, 'carry': 1, 'move': 1}
 }
 
 const names = [
@@ -58,7 +57,7 @@ module.exports.general_body = eco_bodys['300'];
 module.exports.max_roles = {
     'harvester' : 2,
     'builder' : 3,
-    'upgrader': 1,
+    'upgrader': 3,
     'hauler': 2,
     'fighter': 0,
     'healer': 0

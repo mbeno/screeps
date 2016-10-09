@@ -22,8 +22,7 @@ var roleHarvester = {
             if(c.harvester_mode == "long") {
                 if(helper.deliverBase(creep)) return;
                 if(helper.deliverContainer(creep)) return;
-            }
-            if(helper.deliverContainer(creep)) return;
+            } else if(helper.deliverContainer(creep)) return;
             else if (c.harvester_mode == "long") creep.moveTo(Game.flags['idle']);
         }
 	}

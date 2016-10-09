@@ -42,10 +42,8 @@ function harvester() {
     } else {
         bodys = c.eco_bodys;
     }
-    if (energyAvailable >= 1000) {
-        return builder(bodys['1000']);
-    } else if (energyAvailable >= 800) {
-        return builder(bodys['800']);
+    if (energyAvailable >= 700) {
+        return builder(bodys['700']);
     } else if (energyAvailable >= 550) {
         return builder(bodys['550']);
     }
