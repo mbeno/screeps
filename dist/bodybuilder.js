@@ -39,13 +39,18 @@ function harvester() {
     var energyAvailable = Game.spawns[c.spawn].room.energyCapacityAvailable;
     if(c.harvester_mode == "short") {
         bodys = c.harvester;
+        if (energyAvailable >= 700) {
+            return builder(bodys['700']);
+        } else if (energyAvailable >= 550) {
+            return builder(bodys['550']);
+        }
     } else {
         bodys = c.eco_bodys;
-    }
-    if (energyAvailable >= 700) {
-        return builder(bodys['700']);
-    } else if (energyAvailable >= 550) {
-        return builder(bodys['550']);
+        if (energyAvailable >= 800) {
+            return builder(bodys['800']);
+        } else if (energyAvailable >= 550) {
+            return builder(bodys['550']);
+        }
     }
 
 }

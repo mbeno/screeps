@@ -21,8 +21,9 @@ const eco_hauler = {
 
 const harvester = {
     '550': {'work': 4, 'carry': 1, 'move': 1},
-    '700': {'work': 6, 'carry': 1, 'move': 1}
+    '700': {'work': 5, 'carry': 1, 'move': 3}
 }
+
 
 const names = [
     'Vegard',
@@ -31,7 +32,9 @@ const names = [
     'Thor',
     'Torjus',
     'Benny',
+    'Marie',
     'Daniel',
+    'Lille-Marie',
     'Lille-Silje',
     'Lille-Vegard',
     'Lille-Benny',
@@ -55,8 +58,8 @@ module.exports.general_body = eco_bodys['300'];
 
 
 module.exports.max_roles = {
-    'harvester' : 2,
-    'builder' : 3,
+    'harvester' : 3,
+    'builder' : 2,
     'upgrader': 2,
     'hauler': 2,
     'fighter': 0,
