@@ -285,7 +285,12 @@ function getEnergy(creep) {
     if(creep.memory.source == null) {
         creep.moveTo(Game.flags['idle']);
     }
-    var ret = creep.withdraw(Game.getObjectById(creep.memory.source), RESOURCE_ENERGY)
+    var source = Game.getObjectById(creep.memory.source);
+    if (source.store[RESOURCE_ENERGY] < 100) {
+        creep.memory.source = null;
+        return;
+    }
+    var ret = creep.withdraw(source, RESOURCE_ENERGY)
     if(ret == ERR_NOT_IN_RANGE) {
         creep.moveTo(Game.getObjectById(creep.memory.source));
     } else if (ret != OK) {
