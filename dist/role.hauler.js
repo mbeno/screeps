@@ -13,10 +13,10 @@ var _ = require('lodash');
 module.exports = {
     run: function(creep) {
         if(creep.memory.status == 'delivering' && creep.carry.energy > 0) {
-            if(!helper.deliverEnergy(creep)) {
-                creep.memory.status = 'gathering';
-            }
-
+            if(helper.deliverBase(creep)) return;
+            if(helper.deliverTower(creep)) return;
+            if(helper.deliverContainer(creep)) return;
+            creep.memory.status = 'gathering';
         } else {
             creep.memory.status = 'gathering'
             helper.getEnergy(creep);
