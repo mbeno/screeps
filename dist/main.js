@@ -8,6 +8,7 @@ var roleHauler = require('role.hauler');
 var roleTower = require('role.turret');
 var roleFighter = require('role.fighter');
 var roleHealer = require('role.healer');
+var roleLink = require('role.link');
 var _ = require('lodash');
 var c = require('config');
 const vocabulary = [
@@ -74,14 +75,14 @@ module.exports.loop = function () {
 
     clearIdle();
     roleManager.run("harvester");
+    roleManager.run("hauler");
     roleManager.run("builder");
     roleManager.run("upgrader");
-    roleManager.run("hauler");
     roleManager.run('fighter');
     roleManager.run('healer');
 
     roleTower.run();
-
+    roleLink.run();
 
     if(cpumon) console.log("Cpu used  roleTower.run(); " + (Game.cpu.getUsed() - cpu_used));
 

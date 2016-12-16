@@ -1,5 +1,6 @@
 const bodys = {
     'general': {'work':5,'move':5,'carry':5},
+    'builder': {'work':5,'move':8,'carry':10},
     'speed_harvester': {'work':9, 'move':2},
     'fighter': {'tough':5, 'move':7, 'attack':7},
     'healer': {'tough': 3, 'move':4, 'heal':3},
@@ -23,7 +24,32 @@ const harvester = {
     '550': {'work': 4, 'carry': 1, 'move': 1},
     '700': {'work': 5, 'carry': 1, 'move': 3}
 }
+/**
+ * Vegard: miner
+ * Torjus: hauler
+ * Silje: HMS
+ * Benjamin: upgrader
+ * Daniel: builder
+ * Marie: miner
+ * Thor: Fighter
+ * Benny: healer
+ *
+ * hauler
+ * fighter
+ * healer
+ * upgrader
+ * builder
+ * miner
+ */
 
+const new_names = {
+    'harvester': ['Vegard', 'Lille-Vegard'],
+    'healer': ['Torjus', 'Lille-Torjus', 'T-Jizzle', 'T-Juice'],
+    'hms': ['Silje', 'Lille-Silje'],
+    'upgrader': ['Benjamin', 'Lille-Benjamin', 'Mini-Benjamin'],
+    'fighter': ['Thor', 'Lille-Thor'],
+    'hauler': ['Benny','Lille-Benny', 'BennyB', 'Mr. Benoisen'],
+    'builder': ['Daniel', 'Lille-Daniel', 'Mini-Daniel']}
 
 const names = [
     'Vegard',
@@ -32,9 +58,7 @@ const names = [
     'Thor',
     'Torjus',
     'Benny',
-    'Marie',
     'Daniel',
-    'Lille-Marie',
     'Lille-Silje',
     'Lille-Vegard',
     'Lille-Benny',
@@ -45,7 +69,7 @@ const names = [
     'Lille-Safet'
     ];
 
-
+module.exports.new_names = new_names;
 module.exports.harvester_mode = harvester_mode;
 module.exports.harvester = harvester;
 module.exports.eco_hauler = eco_hauler;
@@ -58,21 +82,21 @@ module.exports.general_body = eco_bodys['300'];
 
 
 module.exports.max_roles = {
-    'harvester' : 3,
-    'builder' : 1,
-    'upgrader': 2,
+    'harvester' : 2,
+    'builder' : 2,
+    'upgrader': 1,
     'hauler': 3,
-    'fighter': 0,
-    'healer': 0
+    'fighter': 2,
+    'healer': 2
     };
 module.exports.max_creeps = 14;
 module.exports.spawn = 'Spawn1';
 module.exports.names = names;
 module.exports.creep = {
-    'wall_max_repair': 20000,
-    'rampart_max_repair': 20000
+    'wall_max_repair': 50000,
+    'rampart_max_repair': 50000
 }
 module.exports.tower = {
-    'wall_max_repair': 20000,
-    'rampart_max_repair': 20000
+    'wall_max_repair': 100000,
+    'rampart_max_repair': 100000
 }

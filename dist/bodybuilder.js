@@ -23,11 +23,26 @@ function general() {
 
 }
 
+function builders() {
+    var energyAvailable = Game.spawns[c.spawn].room.energyCapacityAvailable;
+    if (energyAvailable >= 1250) {
+        return builder(c.bodys['builder']);
+    } else if (energyAvailable >= 1000) {
+        return builder(c.bodys['general']);
+    } else if (energyAvailable >= 800) {
+        return builder(c.eco_bodys['800']);
+    } else if (energyAvailable >= 550) {
+        return builder(c.eco_bodys['550']);
+    } else if (energyAvailable >= 300) {
+        return builder(c.bodys['300']);
+    }
+
+
+}
+
 function hauler() {
     var energyAvailable = Game.spawns[c.spawn].room.energyCapacityAvailable;
-    if (energyAvailable >= 1000) {
-        return builder(c.eco_hauler['1000']);
-    } else if (energyAvailable >= 800) {
+    if (energyAvailable >= 800) {
         return builder(c.eco_hauler['800']);
     } else if (energyAvailable >= 550) {
         return builder(c.eco_hauler['550']);
@@ -55,13 +70,26 @@ function harvester() {
 
 }
 
+function fighter() {
+
+    return builder(c.bodys['fighter']);
+}
+
+function healer() {
+   return builder(c.bodys['healer']);
+}
+
 function build(role) {
-    if (role == "upgrader" || role == "builder") {
+    if (role == "builder") {
+        return builders();
+    } else if (role == "upgrader") {
         return general();
     } else if (role == "hauler") {
         return hauler()
     } else if (role == "fighter") {
+        return fighter();
     } else if (role == "healer") {
+        return healer();
     } else if (role == "harvester") {
         return harvester();
     }

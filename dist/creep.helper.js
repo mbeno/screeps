@@ -10,21 +10,27 @@ var _ = require('lodash');
 var c = require('config');
 function findEnergyStorage(creep) {
     var sources = _.filter(creep.room.find(FIND_STRUCTURES),
-    (o) => {return (o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity) || (o.structureType == STRUCTURE_CONTAINER && o.store[RESOURCE_ENERGY] > 300 )});
-    var prefered_sources = _.filter(sources,
-    (o) => {return Memory.storage_containers.indexOf(o.id) > -1});
-    if(prefered_sources.length > 0) {
-        creep.memory.source = creep.pos.findClosestByPath(prefered_sources).id;
+    (o) => {return (o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > 300) || (Memory.storage_containers.indexOf(o.id) > -1 && o.structureType == STRUCTURE_CONTAINER && o.store[RESOURCE_ENERGY] > 300 )});
+    var link_sources = _.filter(creep.room.find(FIND_STRUCTURES), (o) => { return o.structureType == STRUCTURE_LINK && o.energy > 0 && Memory.storage_links.indexOf(o.id) > -1});
+    if(link_sources.length > 0) {
+        creep.memory.source = creep.pos.findClosestByPath(link_sources).id;
+    } else if(sources.length > 0) {
+        creep.memory.source = creep.pos.findClosestByPath(sources).id;
     } else {
-        findEnergySource(creep);
+        return false;
     }
 }
+function towerNeedEnergy(creep) {
+
+    var towers = _.filter(creep.room.find(FIND_STRUCTURES), (o) => { return o.structureType == STRUCTURE_TOWER && (o.energy + 100) < o.energyCapacity});
+    if (towers.length > 0) return true;
+    return false;
+}
+
 
 function findHarvesterStorage(creep) {
     var sources = _.filter(creep.room.find(FIND_STRUCTURES),
-                                (o) => {return (((o.structureType == STRUCTURE_STORAGE && o.store[RESOURCE_ENERGY] > creep.carryCapacity) || (o.structureType == STRUCTURE_CONTAINER && o.store[RESOURCE_ENERGY] > 300 )) && Memory.source_containers.indexOf(o.id) > -1)});
-    var prefered_sources = _.filter(sources,
-    (o) => {return });
+    (o) => {return (o.structureType == STRUCTURE_CONTAINER && o.store[RESOURCE_ENERGY] > 300  && Memory.source_containers.indexOf(o.id) > -1) || (o.structureType == STRUCTURE_LINK && o.energy > 0 && Memory.storage_links.indexOf(o.id) > -1) });
     if (sources.length > 0) {
         creep.memory.source = creep.pos.findClosestByPath(sources).id;
     } else {
@@ -36,8 +42,7 @@ function findHarvesterStorage(creep) {
 function baseNeedEnergy(creep) {
     var base = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {
-                return ((structure.structureType == STRUCTURE_EXTENSION ||
-                        structure.structureType == STRUCTURE_SPAWN) && structure.energy < structure.energyCapacity)
+                return ((structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && structure.energy < structure.energyCapacity)
             }
     });
     if (base.length > 0) {
@@ -71,7 +76,7 @@ function deliverBase(creep) {
         } else {
             return true;
         }
-    } else return false;
+    } else return true;
 }
 
 function harvestLoop(creep) {
@@ -96,13 +101,13 @@ function deliverContainer(creep) {
 
         var stor = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => {
-                    return ((structure.structureType == STRUCTURE_STORAGE && (structure.store[RESOURCE_ENERGY] < structure.storeCapacity)) ||
-                            (structure.structureType == STRUCTURE_CONTAINER && Memory.source_containers.indexOf(structure.id) > -1 && structure.store[RESOURCE_ENERGY] < structure.storeCapacity) )
+                    return ((structure.structureType == STRUCTURE_STORAGE && (structure.store[RESOURCE_ENERGY] < structure.storeCapacity)) || (structure.structureType == STRUCTURE_CONTAINER && Memory.source_containers.indexOf(structure.id) > -1 && (structure.store[RESOURCE_ENERGY]+1000) < structure.storeCapacity) )
                 }
         });
         if (stor.length > 0) {
             creep.memory.target = creep.pos.findClosestByRange(stor).id;
         } else {
+            console.log("no storage");
             return false;
         }
     }
@@ -118,6 +123,7 @@ function deliverContainer(creep) {
             return true;
     } else if(ret != OK) {
         creep.memory.source = null;
+        console.log("transfer: " + ret);
         return false;
     } else {
         return true;
@@ -277,16 +283,14 @@ function build(creep) {
 
 function getEnergy(creep) {
     if(creep.memory.source == null) {
-        findHarvesterStorage(creep);
-    }
-    if(creep.memory.source == null && baseNeedEnergy(creep)) {
         findEnergyStorage(creep);
     }
     if(creep.memory.source == null) {
         creep.moveTo(Game.flags['idle']);
+        return;
     }
     var source = Game.getObjectById(creep.memory.source);
-    if (source.store[RESOURCE_ENERGY] < 100) {
+    if (source.store && source.store[RESOURCE_ENERGY] < 100) {
         creep.memory.source = null;
         return;
     }
@@ -298,6 +302,30 @@ function getEnergy(creep) {
     }
 }
 
+function getEnergyHauler(creep) {
+    if(creep.memory.source == null && (baseNeedEnergy(creep) || towerNeedEnergy(creep))) {
+        findEnergyStorage(creep);
+    }
+    if(creep.memory.source == null) {
+        findHarvesterStorage(creep);
+    }
+    if(creep.memory.source == null) {
+        creep.moveTo(Game.flags['idle']);
+        return
+    }
+    var source = Game.getObjectById(creep.memory.source);
+    if (source.store && source.store[RESOURCE_ENERGY] < 100) {
+        creep.memory.source = null;
+        return;
+    }
+    var ret = creep.withdraw(source, RESOURCE_ENERGY)
+    if(ret == ERR_NOT_IN_RANGE) {
+        creep.moveTo(Game.getObjectById(creep.memory.source));
+    } else if (ret != OK) {
+        creep.memory.source = null;
+    }
+
+}
 
 function deliverBase(creep) {
     var base = _.filter(creep.room.find(FIND_STRUCTURES),
@@ -327,7 +355,7 @@ function deliverBase(creep) {
 }
 
 function deliverTower(creep) {
-    var towers = _.filter(creep.room.find(FIND_STRUCTURES), (o) => {return (Memory.haul_targets.indexOf(o) < 0) && (o.structureType == STRUCTURE_TOWER && (o.energy < (o.energyCapacity - 300)))})
+    var towers = _.filter(creep.room.find(FIND_STRUCTURES), (o) => {return (o.structureType == STRUCTURE_TOWER && (o.energy < (o.energyCapacity - 100)))})
     if (towers.length > 0) {
         if(creep.memory.target == null) {
             creep.memory.target = creep.pos.findClosestByRange(towers).id;
@@ -348,8 +376,7 @@ function deliverTower(creep) {
 }
 
 function deliverContainer(creep) {
-    var containers = _.filter(creep.room.find(FIND_STRUCTURES), (o) => { return (Memory.haul_targets.indexOf(o) < 0) && (o.structureType == STRUCTURE_CONTAINER && ((o.store[RESOURCE_ENERGY] + 300) < o.storeCapacity) &&
-                                                                                                                        Memory.storage_containers.indexOf(o.id) > -1 )});
+    var containers = _.filter(creep.room.find(FIND_STRUCTURES), (o) => { return (o.structureType == STRUCTURE_STORAGE && (o.store[RESOURCE_ENERGY] < o.storeCapacity))|| ((Memory.haul_targets.indexOf(o) < 0) && (o.structureType == STRUCTURE_CONTAINER && ((o.store[RESOURCE_ENERGY] + 300) < o.storeCapacity) && Memory.storage_containers.indexOf(o.id) > -1 ))});
     if (containers.length > 0) {
         if(creep.memory.target == null) {
             creep.memory.target = creep.pos.findClosestByRange(containers).id;
@@ -366,6 +393,16 @@ function deliverContainer(creep) {
         return true;
     }
     return false;
+
+}
+
+function linkTransfer(link) {
+
+    var targets = _.filter(link.room.find(FIND_STRUCTURES), (o) => { return o.structureType == STRUCTURE_LINK && Memory.storage_links.indexOf(link.id) && o.energy < o.energyCapacity && o.id != link.id });
+    var ret = link.transferEnergy(link.pos.findClosestByRange(targets));
+    if(ret != OK) {
+        console.log("Transfer return value: " + ret);
+    }
 
 }
 
@@ -389,7 +426,9 @@ module.exports = {
     harvestLoop: harvestLoop,
     deliverBase: deliverBase,
     deliverTower: deliverTower,
+    linkTransfer: linkTransfer,
     deliverContainer: deliverContainer,
-    deliverHarvestContainer: deliverHarvestContainer
+    deliverHarvestContainer: deliverHarvestContainer,
+    getEnergyHauler: getEnergyHauler
 
 };

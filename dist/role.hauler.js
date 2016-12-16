@@ -15,11 +15,12 @@ module.exports = {
         if(creep.memory.status == 'delivering' && creep.carry.energy > 0) {
             if(helper.deliverBase(creep)) return;
             if(helper.deliverTower(creep)) return;
-            if(helper.deliverContainer(creep)) return;
+            var ret = helper.deliverContainer(creep);
+            if(ret) return;
             creep.memory.status = 'gathering';
         } else {
             creep.memory.status = 'gathering'
-            helper.getEnergy(creep);
+            helper.getEnergyHauler(creep);
             if(helper.isFull(creep)) {
                 creep.memory.status = 'delivering';
                 creep.memory.source = null;
